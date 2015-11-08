@@ -1,7 +1,8 @@
 
 info ={
+    "config":"false",
     "threads":"16",
-    "sentence_length":"80",
+    "sentence_length":"100",
     "training_corpus":"",
     "develop_corpus":"",
     "test_corpus":"",
@@ -12,7 +13,7 @@ info ={
     #moses
     "n-gram":"5",
     #"hierarchical":"--hierarchical --glue-grammar",
-    "phrase":"-reordering"
+    "phrase":"-reordering",
     #end moses
     #bnplm
     "bnplm_target_context":"5",
@@ -24,4 +25,7 @@ info ={
     "bnplm_output_embedding":"150",
     "bnplm_hidden":"512",
     #end bnplm
+    #nmt
+    "nmt_loopiters":"100000",
+    #emd nmt
 }

@@ -80,4 +80,3 @@ class EasyConfig :
 		if not os.path.isfile(os.path.join(self.easy_workpath, "config.py")):
 			shutil.copy("data/config.py", os.path.join(self.easy_workpath, "config.py"))
 
-
