@@ -62,6 +62,9 @@ class EasyConfig :
 		self.easy_steps = os.path.join(self.easy_workpath, "steps")
 		if not os.path.exists(self.easy_steps):
 			os.mkdir(self.easy_steps)
+		if not os.path.isfile(os.path.join(self.easy_workpath, "steps/step.txt")):
+			ofile = open(os.path.join(self.easy_workpath, "steps/step.txt"), 'w')
+			ofile.close()
 
 		self.preparation()
 		self.make_configfile()

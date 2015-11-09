@@ -1,6 +1,7 @@
 import os
 from utils import write_step
 from config import info as exp_config
+import easycorpus
 
 def pkl (easy_config, training_filename):
   command1 = "python " + easy_config.nmt_path + "preprocess/preprocess.py "\
@@ -62,11 +63,11 @@ def create_statefile(easy_config):
     + ",\n n_sym_target = " + str(int(exp_config["target_vocb"])+1)\
     + ",\n loopIters = " + exp_config["nmt_loopiters"]\
     + ",\n source = [\"" + os.path.join(easy_config.easy_corpus,"binarized_text."+exp_config["source_id"]+".shuf.h5") + "\"]"\
-    + ",\n indx_word = \"" + os.path.join(easy_config.easy_corpus, "ivocab."+exp_config["target_id"]+".pkl") +"\""\
-    + ",\n word_indx = \"" + os.path.join(easy_config.easy_corpus,"vocab."+exp_config["target_id"]+".pkl") +"\""\
-    + ",\n target = [\"" + os.path.join(easy_config.easy_corpus,"binarized_text."+exp_config["source_id"]+".shuf.h5") +"\"]"\
-    + ",\n indx_word_target = \"" + os.path.join(easy_config.easy_corpus, "ivocab."+exp_config["source_id"]+".pkl")+"\""\
-    + ",\n word_indx_trgt = \"" + os.path.join(easy_config.easy_corpus, "vocab."+exp_config["source_id"]+".pkl")+"\""\
+    + ",\n indx_word = \"" + os.path.join(easy_config.easy_corpus, "ivocab."+exp_config["source_id"]+".pkl") +"\""\
+    + ",\n word_indx = \"" + os.path.join(easy_config.easy_corpus,"vocab."+exp_config["source_id"]+".pkl") +"\""\
+    + ",\n target = [\"" + os.path.join(easy_config.easy_corpus,"binarized_text."+exp_config["target_id"]+".shuf.h5") +"\"]"\
+    + ",\n indx_word_target = \"" + os.path.join(easy_config.easy_corpus, "ivocab."+exp_config["target_id"]+".pkl")+"\""\
+    + ",\n word_indx_trgt = \"" + os.path.join(easy_config.easy_corpus, "vocab."+exp_config["target_id"]+".pkl")+"\""\
     + ",\n prefix = \'" + easy_config.easy_train + "/search_\'"\
     + "\n)"
   if not os.path.isfile(os.path.join(easy_config.easy_train, "state.py")):
@@ -76,9 +77,9 @@ def create_statefile(easy_config):
 
 
 def overfitting_prepare(easy_config, training_filename, sampling_base = 30):
-  easycorpus.sampling_file(easy_config.easy_corpus+training_filename+".true."+exp_config["source_id"], 
-    easy_config.easy_overfitting+"OF.true."+exp_config["source_id"], sampling_base)
-  easycorpus.sampling_file(easy_config.easy_corpus+training_filename+".true."+exp_config["target_id"], 
-    easy_config.easy_overfitting+"OF.true."+exp_config["target_id"], sampling_base)
-  write_step("overfitting_prepare")
+  easycorpus.sampling_file(os.path.join(easy_config.easy_corpus, training_filename+".clean."+exp_config["source_id"]), 
+    easy_config.easy_overfitting+"/OF.clean."+exp_config["source_id"], sampling_base)
+  easycorpus.sampling_file(os.path.join(easy_config.easy_corpus, training_filename+".clean."+exp_config["target_id"]), 
+    easy_config.easy_overfitting+"/OF.clean."+exp_config["target_id"], sampling_base)
+  write_step("overfitting_prepare", easy_config)
 

@@ -1,4 +1,5 @@
 import os
+import easybleu
 from utils import write_step
 from config import info as exp_config
 
@@ -230,7 +231,20 @@ def view_result (easy_config, testfilename) :
       break
     count += 1
 
-
+def test_on_train (easy_config) :
+  command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
+    + " -threads " + exp_config["threads"]\
+    + " -f " + os.path.join(easy_config.easy_tuning, "moses.ini ")\
+    + " < " + os.path.join(easy_config.easy_overfitting, "OF.clean." + exp_config["source_id"])\
+    + " > " + os.path.join(easy_config.easy_overfitting, "OF." + ".translated." + exp_config["target_id"])\
+    + " 2> " + os.path.join(easy_config.easy_overfitting, "OF.clean." + ".out") + " "
+  command2 = easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl "\
+    + " -lc " + os.path.join(easy_config.easy_overfitting, "OF.clean." + exp_config["target_id"])\
+    + " < " + os.path.join(easy_config.easy_overfitting, "OF." + ".translated." + exp_config["target_id"])
+  write_step (command1, easy_config)
+  os.system(command1)
+  write_step (command2, easy_config)
+  os.system(command2)
 
 ######################### Training NPLM #############################
 def prepare_corpus (easy_config) :

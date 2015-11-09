@@ -2,7 +2,7 @@ import os
 import time
 
 def write_step (command, easy_config) :
-  outfile = open (os.path.join(easy_config.easy_steps, "step.txt"), 'wa')
+  outfile = open (os.path.join(easy_config.easy_steps, "step.txt"), 'a')
   outfile.write (str (time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time())) ) + "\n")
   outfile.write ("pid: " + str(os.getpid()))
   outfile.write (command + "\n")
