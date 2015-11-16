@@ -187,7 +187,7 @@ def count_corpus_words(path):
 
 def batch_create_corpus(inpath,opath, num=10, filename="C_B"):
   dirs = os.listdir(inpath)
-  i = 0
+  i = 4
   while (i < num):
     oopath = os.path.join(opath, str(i))
     if not os.path.exists(oopath):
@@ -312,11 +312,27 @@ def clear_chinese_messy_code(ifile, ofile, word_dict):
   infile.close()
   outfile.close()
 
+def word2alphabet(ifile, ofile):
+  infile = open(ifile,'r')
+  outfile = open(ofile, 'w')
+  for line in infile.readlines():
+    new_line = ""
+    for c in line.strip().decode('utf-8'):
+      if c == ' ': 
+        new_line += 'space '
+      else:
+        new_line += c.encode('utf-8') + ' '
+    new_line = new_line.strip()
+    outfile.write(new_line+'\n')
+  infile.close()
+  outfile.close()
+
 def main():
   print "hello polarlion"
+  word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr", "/home/xwshi/data2/Alphabet-WMT/0.5/AWMT.Train.fr")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0","/home/xwshi/data/wmt/B-divide-1800", 10, wmt_dict)
-  batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.1", num=1, filename="WMT")
+  # batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5", num=5, filename="WMT")
   # limiting_sentence_length ("/home/xwshi/data/wmt/Bahdanau/", "en", "fr", "/home/xwshi/data/wmt/Bahdanau-clean/")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100","/home/xwshi/data/wmt/Bahdanau-divide", 180, wmt_dict)
