@@ -13,10 +13,10 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-# exp_id = "4"
-exp_group = "nmt-wmtcb"
-# exp_group = "smt-phrase-wmtcb"
-exp_id = "0"
+# exp_id = "8"
+# exp_group = "nmt-wmtcb"
+exp_group = "smt-phrase-wmtcb"
+exp_id = "0.1"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
 
@@ -113,10 +113,10 @@ def nmt_prepare(easy_config):
   # cpnmt(easy_config)
   training_filename = utils.get_filename(exp_config["training_corpus"])
   write_step("start nmt_prepare", easy_config)
-  tokenisation (easy_config, training_filename)
-  truecaser (easy_config, training_filename)
-  truecasing (easy_config, training_filename)
-  limiting_sentence_length (easy_config, training_filename)
+  # tokenisation (easy_config, training_filename)
+  # truecaser (easy_config, training_filename)
+  # truecasing (easy_config, training_filename)
+  # limiting_sentence_length (easy_config, training_filename)
   pkl(easy_config, training_filename)
   invert(easy_config, training_filename)
   hdf5(easy_config, training_filename)
@@ -133,8 +133,9 @@ def nmt_train(easy_config):
   os.system(command1)
 
 def nmt_test(easy_config):
-  t_tokenisation(easy_config)
-  t_truecasing(easy_config)
+  testfilename = utils.get_filename(exp_config["test_corpus"])
+  t_tokenisation(easy_config, testfilename)
+  t_truecasing(easy_config, testfilename)
   command1 = "python " + easy_config.nmt_path + "sample.py"\
     + " --beam-search "\
     + " --beam-size 12"\
@@ -190,17 +191,25 @@ def nmt_dev_res(easy_config):
 
 def nmt_check_overfitting(easy_config):
   training_filename = utils.get_filename(exp_config["training_corpus"])
-  overfitting_prepare(easy_config, training_filename, 30)
+  import commands
+  lines = int(commands.getstatusoutput('wc -l ' + os.path.join(easy_config.easy_corpus, training_filename+'.clean.'+exp_config["source_id"]))[1].split(' ')[0])
+  print "pairs ", lines
+  # return 
+  from nmt import overfitting_prepare
+  base = 10
+  if lines / 3000 > base:
+    base = lines / 3000
+  overfitting_prepare(easy_config, training_filename, base)
   command1 = "python " + easy_config.nmt_path + "sample.py"\
     + " --beam-search "\
     + " --beam-size 12"\
     + " --state " + os.path.join(easy_config.easy_train, "search_state.pkl")\
-    + " --source " + os.path.join(easy_config.easy_overfitting,"OF.true." + exp_config["source_id"])\
+    + " --source " + os.path.join(easy_config.easy_overfitting,"OF.clean." + exp_config["source_id"])\
     + " --trans " + os.path.join(easy_config.easy_overfitting, "ontrain." + exp_config["target_id"])\
     + " " + os.path.join(easy_config.easy_train, "search_model.npz")
   command2 = (easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl "\
-    + " -lc " + easy_config.easy_overfitting + "OF.true." + exp_config["target_id"]\
-    + " < " + easy_config.easy_overfitting + "ontrain." + exp_config["target_id"])
+    + " -lc " + easy_config.easy_overfitting + "/OF.clean." + exp_config["target_id"]\
+    + " < " + easy_config.easy_overfitting + "/ontrain." + exp_config["target_id"])
   write_step(command1, easy_config)
   os.system(command1) 
   write_step(command2, easy_config)
@@ -217,9 +226,10 @@ def nmt_make_backup(easy_config):
   os.system(command2)
 
 def bleu_score(easy_config):
+  testfilename = utils.get_filename(exp_config["test_corpus"])
   command2 = (easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl " 
-    + " -lc " + easy_config.easy_evaluation + testfilename + ".true." + exp_config["target_id"] 
-    + " < " + easy_config.easy_evaluation + testfilename + ".translated." + exp_config["target_id"]
+    + " -lc " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["target_id"]) 
+    + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])
     # + " < " + easy_config.easy_evaluation + testfilename + ".translated." + exp_config["target_id"] + ".9"
     )
   write_step (command2, easy_config)
@@ -236,20 +246,21 @@ def easymoses ():
   # smt_language_model_training (easy_config)
   # smt_translation_model_training (easy_config)
   # smt_tuning (easy_config)
-  # smt_testing (easy_config)
-  # smt_check_train(easy_config)
+  smt_testing (easy_config)
+  smt_check_train(easy_config)
   # cross_corpus("18", "nmt", "te", easy_config)
   # cross_corpus("17", "smt", "te", easy_config)
   # nplm (easy_config)
   # bnplm (easy_config)
   # nmt_prepare(easy_config)
-  nmt_train(easy_config)
-  # nmt_check_overfitting_1(easy_config)
+  # nmt_train(easy_config)
+  # nmt_check_overfitting(easy_config)
   # nmt_check_overfitting_2(easy_config)
   # nmt_dev(easy_config)
   # nmt_dev_res(easy_config)
   # nmt_make_backup(easy_config)
   # nmt_test(easy_config)
+
   # bleu_score(easy_config)
 
 if __name__ == "__main__" :
@@ -263,6 +274,7 @@ if __name__ == "__main__" :
     print "you input a wrong exp id"
     print "you input a wrong exp id"
     print "you input a wrong exp id" 
+    exit()
   easymoses ()
   sys.path.remove(easy_config.easy_workpath)
 

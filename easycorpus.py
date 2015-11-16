@@ -314,10 +314,13 @@ def clear_chinese_messy_code(ifile, ofile, word_dict):
 
 def main():
   print "hello polarlion"
+  # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0", "fr", "en")
+  # divide_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0","/home/xwshi/data/wmt/B-divide-1800", 10, wmt_dict)
+  batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.1", num=1, filename="WMT")
   # limiting_sentence_length ("/home/xwshi/data/wmt/Bahdanau/", "en", "fr", "/home/xwshi/data/wmt/Bahdanau-clean/")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100","/home/xwshi/data/wmt/Bahdanau-divide", 180, wmt_dict)
-  batch_create_corpus("/home/xwshi/data/wmt/Bahdanau-divide", "/home/xwshi/data2/WMT-Corpus-Bleu", num=10, filename="WMT")
+  # batch_create_corpus("/home/xwshi/data/wmt/Bahdanau-divide", "/home/xwshi/data2/WMT-Corpus-Bleu", num=1, filename="WMT")
   #prepare_gale_corpus("/home/xwshi/data/ldc-zh-en/gale_p1_ch_blog", "/home/xwshi/data/ldc-zh-en/gale", "gale_p1_ch_blog")
   #batch_untar("/home/xwshi/data/ldc-zh-en/tgz", "/home/xwshi/data/ldc-zh-en/untgz/")
   #batch_prepare_gale_corpus("/home/xwshi/data/ldc-zh-en/untgz/", "/home/xwshi/data/ldc-zh-en/gale")
