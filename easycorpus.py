@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 def limiting_sentence_length (inpath, source_id, target_id, outpath, length=100) :
   for filename in os.listdir(inpath):
     filename = filename.split('.')[0]
@@ -318,7 +317,7 @@ def word2alphabet(ifile, ofile):
   for line in infile.readlines():
     new_line = ""
     for c in line.strip().decode('utf-8'):
-      if c == ' ': 
+      if c.isspace(): 
         new_line += 'space '
       else:
         new_line += c.encode('utf-8') + ' '
@@ -327,9 +326,33 @@ def word2alphabet(ifile, ofile):
   infile.close()
   outfile.close()
 
+def alphabet2word(ifile, ofile):
+  infile = open(ifile, 'r')
+  outfile = open(ofile, 'w')
+  for line in infile.readlines():
+    new_line = ""
+    for w in line.strip().split(' '):
+      if w == 'space':
+        new_line += ' '
+      else:
+        new_line += w
+    outfile.write(new_line.strip()+'\n')
+  infile.close()
+  outfile.close()
+
+def bleu(ifile, refile):
+  command2 = "/opt/translation/moses/scripts/generic/multi-bleu.perl "\
+    + " -lc " + refile\
+    + " < " + ifile
+  os.system(command2)
+
+
 def main():
   print "hello polarlion"
-  # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/Test/WMT.Test.en", "/home/xwshi/data2/Alphabet-WMT/Test/AWMT.Train.en")
+  word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0/WMT.Train.fr", "/home/xwshi/data2/Alphabet-WMT/1/AWMT.Train.fr")
+  # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr", "test.en")
+  # alphabet2word("test.en", "test.new")
+  # bleu("test.new", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0","/home/xwshi/data/wmt/B-divide-1800", 10, wmt_dict)
   # batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5", num=5, filename="WMT")

@@ -13,10 +13,10 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-# exp_id = "8"
-exp_group = "alphabet-wmt"
-exp_id = "0.5"
+exp_group = "nmt-alphabet-wmt"
+exp_id = "1"
 # exp_group = "nmt-wmtcb"
+# exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
 # exp_id = "0.1"
 
@@ -114,6 +114,8 @@ from nmt import *
 def nmt_prepare(easy_config):
   # cpnmt(easy_config)
   training_filename = utils.get_filename(exp_config["training_corpus"])
+  # print exp_config["training_corpus"],training_filename
+  # exit()
   write_step("start nmt_prepare", easy_config)
   tokenisation (easy_config, training_filename)
   truecaser (easy_config, training_filename)
@@ -255,13 +257,13 @@ def easymoses ():
   # nplm (easy_config)
   # bnplm (easy_config)
   # nmt_prepare(easy_config)
-  # nmt_train(easy_config)
+  nmt_train(easy_config)
   # nmt_check_overfitting(easy_config)
   # nmt_check_overfitting_2(easy_config)
   # nmt_dev(easy_config)
   # nmt_dev_res(easy_config)
   # nmt_make_backup(easy_config)
-  nmt_test(easy_config)
+  # nmt_test(easy_config)
   # bleu_score(easy_config)
 
 if __name__ == "__main__" :
