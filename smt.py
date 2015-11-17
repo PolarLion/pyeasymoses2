@@ -139,7 +139,7 @@ def tuning_truecase (easy_config, devfilename) :
 
 def tuning_process (easy_config, devfilename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "scripts/training/mert-moses.pl "\
-    + "--decoder-flags=\"-threads 32\""\
+    + "--decoder-flags=\"-threads "+exp_config["threads"]+"\""\
     + " -threads " + exp_config["threads"]\
     + " -working-dir " + easy_config.easy_tuning\
     + " " + os.path.join(easy_config.easy_tuning, devfilename + ".true." + exp_config["source_id"])\

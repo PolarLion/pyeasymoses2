@@ -13,8 +13,10 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-exp_group = "nmt-alphabet-wmt"
-exp_id = "1"
+exp_group = "smt-phrase-nnjm-wmt"
+exp_id = "0"
+# exp_group = "nmt-alphabet-wmt"
+# exp_id = "1"
 # exp_group = "nmt-wmtcb"
 # exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
@@ -68,14 +70,15 @@ def smt_tuning (easy_config) :
 
 def add_bnplm_feature(easy_config):
   if os.path.isfile(os.path.join(easy_config.easy_train, "model/moses.ini")):
-    outfile = open(os.path.join(easy_config.easy_train, "model/moses.ini"), 'wa')
-    easy_bnplm_feature = "BilingualNPLM "\
-      + " order=" + exp_config["target-context"]\
-      + " source_window=" + exp_config["source-context"]\
-      +  "path= " + os.path.join(easy_config.easy_bnplm, "train.10K.model.nplm."+exp_config["bnplm_epochs"])\
+    outfile = open(os.path.join(easy_config.easy_train, "model/moses.ini"), 'a')
+    easy_bnplm_feature = "[feature]\nBilingualNPLM "\
+      + " order=" + exp_config["bnplm_target_context"]\
+      + " source_window=" + exp_config["bnplm_source_context"]\
+      + " path= " + os.path.join(easy_config.easy_bnplm, "train.10k.model.nplm."+exp_config["bnplm_epochs"])\
       + " source_vocab=" + os.path.join(easy_config.easy_bnplm, "vocab.source")\
       + " target_vocab=" + os.path.join(easy_config.easy_bnplm, "vocab.target")
-    outfile.write()
+    outfile.write(easy_bnplm_feature)
+    write_step("add bnplm feature"+easy_bnplm_feature, easy_config)
     outfile.close()
 
 def bnplm (easy_config) :
@@ -249,15 +252,17 @@ def easymoses ():
   # smt_training_corpus_preparation (easy_config)
   # smt_language_model_training (easy_config)
   # smt_translation_model_training (easy_config)
-  # smt_tuning (easy_config)
+  # bnplm (easy_config)
+  # add_bnplm_feature(easy_config)
+  smt_tuning (easy_config)
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
   # cross_corpus("18", "nmt", "te", easy_config)
   # cross_corpus("17", "smt", "te", easy_config)
   # nplm (easy_config)
-  # bnplm (easy_config)
+  
   # nmt_prepare(easy_config)
-  nmt_train(easy_config)
+  # nmt_train(easy_config)
   # nmt_check_overfitting(easy_config)
   # nmt_check_overfitting_2(easy_config)
   # nmt_dev(easy_config)
