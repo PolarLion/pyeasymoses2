@@ -14,9 +14,11 @@ sys.setdefaultencoding('utf8')
 
 # exp_group = "test"
 # exp_id = "8"
+exp_group = "alphabet-wmt"
+exp_id = "0.5"
 # exp_group = "nmt-wmtcb"
-exp_group = "smt-phrase-wmtcb"
-exp_id = "0.1"
+# exp_group = "smt-phrase-wmtcb"
+# exp_id = "0.1"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
 
@@ -113,10 +115,10 @@ def nmt_prepare(easy_config):
   # cpnmt(easy_config)
   training_filename = utils.get_filename(exp_config["training_corpus"])
   write_step("start nmt_prepare", easy_config)
-  # tokenisation (easy_config, training_filename)
-  # truecaser (easy_config, training_filename)
-  # truecasing (easy_config, training_filename)
-  # limiting_sentence_length (easy_config, training_filename)
+  tokenisation (easy_config, training_filename)
+  truecaser (easy_config, training_filename)
+  truecasing (easy_config, training_filename)
+  limiting_sentence_length (easy_config, training_filename)
   pkl(easy_config, training_filename)
   invert(easy_config, training_filename)
   hdf5(easy_config, training_filename)
@@ -246,8 +248,8 @@ def easymoses ():
   # smt_language_model_training (easy_config)
   # smt_translation_model_training (easy_config)
   # smt_tuning (easy_config)
-  smt_testing (easy_config)
-  smt_check_train(easy_config)
+  # smt_testing (easy_config)
+  # smt_check_train(easy_config)
   # cross_corpus("18", "nmt", "te", easy_config)
   # cross_corpus("17", "smt", "te", easy_config)
   # nplm (easy_config)
@@ -259,8 +261,7 @@ def easymoses ():
   # nmt_dev(easy_config)
   # nmt_dev_res(easy_config)
   # nmt_make_backup(easy_config)
-  # nmt_test(easy_config)
-
+  nmt_test(easy_config)
   # bleu_score(easy_config)
 
 if __name__ == "__main__" :

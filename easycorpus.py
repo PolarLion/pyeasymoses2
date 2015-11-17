@@ -329,7 +329,7 @@ def word2alphabet(ifile, ofile):
 
 def main():
   print "hello polarlion"
-  word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr", "/home/xwshi/data2/Alphabet-WMT/0.5/AWMT.Train.fr")
+  # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/Test/WMT.Test.en", "/home/xwshi/data2/Alphabet-WMT/Test/AWMT.Train.en")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0","/home/xwshi/data/wmt/B-divide-1800", 10, wmt_dict)
   # batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5", num=5, filename="WMT")

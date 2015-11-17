@@ -27,5 +27,6 @@ info ={
     #end bnplm
     #nmt
     "nmt_loopiters":"100000",
+    "nmt_hidden_dim":"1000",
     #emd nmt
 }
