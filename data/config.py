@@ -12,6 +12,7 @@ info ={
     "target_vocb":"30000",
     #moses
     "n-gram":"5",
+    "tuning_max_iterations":"20",
     #"hierarchical":"--hierarchical --glue-grammar",
     "phrase":"-reordering",
     #end moses

@@ -13,14 +13,16 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-exp_group = "smt-phrase-nnjm-wmt"
-exp_id = "0"
+# exp_group = "smt-phrase-nnjm-wmt"
+# exp_id = "0"
 # exp_group = "nmt-alphabet-wmt"
 # exp_id = "1"
 # exp_group = "nmt-wmtcb"
 # exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
-# exp_id = "0.1"
+# exp_id = "19"
+exp_group = "fan-tuning"
+exp_id = "x"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
 
@@ -65,6 +67,25 @@ def smt_tuning (easy_config) :
   tuning_truecase (easy_config, devfilename)
   tuning_process (easy_config, devfilename)
   # print "finish tuning"
+def fan_tuning (easy_config):
+  num = 50
+  for i in range(11, num+1):
+    devfilename = utils.get_filename(exp_config["develop_corpus"]+str(i))
+    if not os.path.exists(os.path.join(easy_config.easy_tuning, str(i))):
+      os.mkdir(os.path.join(easy_config.easy_tuning, str(i)))
+    tuning_tokenizer (easy_config, str(i) + "/" + devfilename)
+    tuning_truecase (easy_config, str(i) + "/" + devfilename)
+    command1 = "nohup nice " + easy_config.mosesdecoder_path + "scripts/training/mert-moses.pl "\
+      + "--decoder-flags=\"-threads "+exp_config["threads"]+"\""\
+      + " -threads " + exp_config["threads"]\
+      + " -maximum-iterations " + exp_config["tuning_max_iterations"]\
+      + " -working-dir " + os.path.join(easy_config.easy_tuning, str(i))\
+      + " " + os.path.join(easy_config.easy_tuning, str(i) + "/" + devfilename + ".true." + exp_config["source_id"])\
+      + " " + os.path.join(easy_config.easy_tuning, str(i) + "/" + devfilename + ".true." + exp_config["target_id"])\
+      + " " + easy_config.mosesdecoder_path + "bin/moses_chart " + os.path.join(easy_config.easy_train,"model/moses.ini ")\
+      + " --mertdir " + easy_config.mosesdecoder_path + "bin/ &> " + os.path.join(easy_config.easy_tuning, str(i) + "/" + "mert.out") + " &"
+    write_step (command1, easy_config)
+    os.system(command1)
 
 ######################   bnplm #############################################
 
@@ -244,6 +265,7 @@ def bleu_score(easy_config):
 #########################  nmt ############################
 
 
+
 def easymoses ():
   a = 0
   if "true" != exp_config["config"]:
@@ -254,7 +276,8 @@ def easymoses ():
   # smt_translation_model_training (easy_config)
   # bnplm (easy_config)
   # add_bnplm_feature(easy_config)
-  smt_tuning (easy_config)
+  # smt_tuning (easy_config)
+  fan_tuning(easy_config)
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
   # cross_corpus("18", "nmt", "te", easy_config)

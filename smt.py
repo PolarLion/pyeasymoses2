@@ -141,6 +141,7 @@ def tuning_process (easy_config, devfilename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "scripts/training/mert-moses.pl "\
     + "--decoder-flags=\"-threads "+exp_config["threads"]+"\""\
     + " -threads " + exp_config["threads"]\
+    + " -maximum-iterations " + exp_config["tuning_max_iterations"]\
     + " -working-dir " + easy_config.easy_tuning\
     + " " + os.path.join(easy_config.easy_tuning, devfilename + ".true." + exp_config["source_id"])\
     + " " + os.path.join(easy_config.easy_tuning, devfilename + ".true." + exp_config["target_id"])\

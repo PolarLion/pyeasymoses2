@@ -63,6 +63,7 @@ def create_statefile(easy_config):
     + ",\n n_sym_target = " + str(int(exp_config["target_vocb"])+1)\
     + ",\n loopIters = " + exp_config["nmt_loopiters"]\
     + ",\n dim = " + exp_config["nmt_hidden_dim"]\
+    + ",\n seqlen = " + exp_config["sentence_length"]\
     + ",\n source = [\"" + os.path.join(easy_config.easy_corpus,"binarized_text."+exp_config["source_id"]+".shuf.h5") + "\"]"\
     + ",\n indx_word = \"" + os.path.join(easy_config.easy_corpus, "ivocab."+exp_config["source_id"]+".pkl") +"\""\
     + ",\n word_indx = \"" + os.path.join(easy_config.easy_corpus,"vocab."+exp_config["source_id"]+".pkl") +"\""\

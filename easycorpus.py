@@ -346,10 +346,26 @@ def bleu(ifile, refile):
     + " < " + ifile
   os.system(command2)
 
+def divide_corpus_by_sentence(inpath, outpath, num):
+  files = os.listdir(inpath)
+  for afile in files:
+    count = 1
+    infile = open(os.path.join(inpath, afile),'r')
+    for line in infile.readlines():
+      if not os.path.exists(os.path.join(outpath, str(count))):
+        os.mkdir(os.path.join(outpath, str(count)))
+      outfile = open(os.path.join(outpath, str(count)+'/'+afile),'w')
+      for i in range(0, num):
+        outfile.write(line)
+      outfile.close()
+      count += 1
+    infile.close()
+
 
 def main():
   print "hello polarlion"
-  word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0/WMT.Train.fr", "/home/xwshi/data2/Alphabet-WMT/1/AWMT.Train.fr")
+  divide_corpus_by_sentence("/home/xwshi/easymoses_workspace2/fan-tuning/Dev/", "/home/xwshi/easymoses_workspace2/fan-tuning/Dev-divide/", 1000)
+  # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/Test/WMT.Test.en", "/home/xwshi/data2/Alphabet-WMT/Test/AWMT.Test.en")
   # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr", "test.en")
   # alphabet2word("test.en", "test.new")
   # bleu("test.new", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr")
