@@ -150,6 +150,70 @@ def tuning_process (easy_config, devfilename) :
   write_step (command1, easy_config)
   os.system(command1)
 
+def read_moses_ini(inpath):
+  import re
+  files = os.listdir(inpath)
+  ini_dict = {}
+  if not os.path.isfile(os.path.join(inpath, 'moses.ini')):
+    return ini_dict
+  ini_file = open(os.path.join(inpath, 'moses.ini'), 'r')
+  for line in ini_file.readlines():
+    mt = re.match(r'# BLEU (\d\.?\d*)(.*)', line)
+    if mt :
+      # #print mt.groups()[0]
+      if mt.groups()[0] == "0":return ini_dict
+      ini_dict['bleu'] = mt.groups()[0]
+      continue
+    lr0 = re.match(r'LexicalReordering0= (.*)', line)
+    if lr0:
+      #print lr0.groups()[0]
+      count = 0
+      for w in lr0.groups()[0].split(' '):
+        ini_dict['LexicalReordering0'+str(count)] = w
+        count += 1
+      continue
+    d0 = re.match(r'Distortion0= (.+)', line)
+    if d0:
+      #print d0.groups()[0]
+      ini_dict['Distortion0']=d0.groups()[0]
+      continue
+    LM0 = re.match(r'LM0= (.+)', line)
+    if LM0:
+      # print LM0.groups()[0]
+      ini_dict['LM0']=LM0.groups()[0]
+      continue
+    WordPenalty0 = re.match(r'WordPenalty0= (.+)', line)
+    if WordPenalty0:
+      #print WordPenalty0.groups()[0]
+      ini_dict['WordPenalty0']=WordPenalty0.groups()[0]
+      continue
+    PhrasePenalty0 = re.match(r'PhrasePenalty0= (.+)', line)
+    if PhrasePenalty0:
+      #print PhrasePenalty0.groups()[0]
+      ini_dict['PhrasePenalty0']=PhrasePenalty0.groups()[0]
+      continue
+    TranslationModel0 = re.match(r'TranslationModel0= (.*)', line)
+    if TranslationModel0:
+      #print TranslationModel0.groups()[0]
+      count = 0
+      for w in TranslationModel0.groups()[0].split(' '):
+        ini_dict['TranslationModel0'+str(count)] = w
+        count += 1
+      continue
+    UnknownWordPenalty0 = re.match(r'UnknownWordPenalty0= (.+)', line)
+    if UnknownWordPenalty0:
+      #print UnknownWordPenalty0.groups()[0]
+      ini_dict['UnknownWordPenalty0']=UnknownWordPenalty0.groups()[0]
+      continue
+  return ini_dict
+    # else:
+      # print line
+  # exit()
+
+
+
+
+
 #########################  training translation system 
 
 ####################### testing #############################################
@@ -320,8 +384,8 @@ def cross_corpus(id1, mt_type, tag, easy_config):
   elif tag == "tr" and mt_type == "smt":
     write_step(command2, easy_config)
     os.system(command2)
-  if tag == "te":
-    write_step(command3)
+  if Tag == "te":
+    write_step(comMand3)
     os.system(command3)
 
 
@@ -357,6 +421,4 @@ def train_nplm (easy_config, training_filename) :
     + " &> " + os.path.join(easy_config.easy_bnplm, "nplm.out") + " &"
   write_step (command1, easy_config)
   os.system(command1)
-
-
 

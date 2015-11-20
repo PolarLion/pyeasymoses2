@@ -67,9 +67,10 @@ def smt_tuning (easy_config) :
   tuning_truecase (easy_config, devfilename)
   tuning_process (easy_config, devfilename)
   # print "finish tuning"
+
 def fan_tuning (easy_config):
-  num = 50
-  for i in range(11, num+1):
+  num = 200
+  for i in range(151, num+1):
     devfilename = utils.get_filename(exp_config["develop_corpus"]+str(i))
     if not os.path.exists(os.path.join(easy_config.easy_tuning, str(i))):
       os.mkdir(os.path.join(easy_config.easy_tuning, str(i)))
@@ -86,6 +87,13 @@ def fan_tuning (easy_config):
       + " --mertdir " + easy_config.mosesdecoder_path + "bin/ &> " + os.path.join(easy_config.easy_tuning, str(i) + "/" + "mert.out") + " &"
     write_step (command1, easy_config)
     os.system(command1)
+
+def fan_analyze(easy_config):
+  paths = os.listdir(easy_config.easy_tuning)
+  for path in paths:
+    dic = read_moses_ini(os.path.join(easy_config.easy_tuning, path))
+    if dic :
+      print path + '\t' + dic['LM0'] + '\t' + dic['TranslationModel00'] + '\t' + dic['bleu']
 
 ######################   bnplm #############################################
 
@@ -278,6 +286,8 @@ def easymoses ():
   # add_bnplm_feature(easy_config)
   # smt_tuning (easy_config)
   fan_tuning(easy_config)
+  # fan_analyze(easy_config)
+  # print read_moses_ini("/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/1/")
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
   # cross_corpus("18", "nmt", "te", easy_config)
