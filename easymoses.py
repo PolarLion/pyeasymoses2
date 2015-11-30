@@ -14,15 +14,15 @@ sys.setdefaultencoding('utf8')
 
 # exp_group = "test"
 # exp_group = "smt-phrase-nnjm-wmt"
-# exp_id = "0"
+# exp_id = "9"
 # exp_group = "nmt-alphabet-wmt"
 # exp_id = "1"
-# exp_group = "nmt-wmtcb"
-# exp_id = "8"
+exp_group = "nmt-wmtcb"
+exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
-# exp_id = "19"
-exp_group = "fan-tuning"
-exp_id = "x"
+# exp_id = "180"
+# exp_group = "fan-tuning"
+# exp_id = "x"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
 
@@ -69,8 +69,8 @@ def smt_tuning (easy_config) :
   # print "finish tuning"
 
 def fan_tuning (easy_config):
-  num = 200
-  for i in range(151, num+1):
+  num = 3000
+  for i in range(2701, num+1):
     devfilename = utils.get_filename(exp_config["develop_corpus"]+str(i))
     if not os.path.exists(os.path.join(easy_config.easy_tuning, str(i))):
       os.mkdir(os.path.join(easy_config.easy_tuning, str(i)))
@@ -89,11 +89,61 @@ def fan_tuning (easy_config):
     os.system(command1)
 
 def fan_analyze(easy_config):
+  devfilename = utils.get_filename(exp_config["develop_corpus"]+str(1))
+  print devfilename
+  standard_line = "0.0105348\t0.0651135\t0.0532412\t0.00603957\t0.0532839\t0.0809408\t0.122954\t0.271147\t0.0633011\t0.0520243\t0.0513287\t0.0239177\t0.024159\t1\t-0.122014"
   paths = os.listdir(easy_config.easy_tuning)
+  outfile = open(os.path.join(easy_config.easy_tuning, "sentences.txt"),'w')
+  count = 0
   for path in paths:
+    if os.path.isfile(os.path.join(easy_config.easy_tuning, path)):continue
+    # if os.path.isfile(os.path.join(easy_config.easy_tuning, path+"/run20.moses.ini")):
+      # print path
+    infile = open(os.path.join(easy_config.easy_tuning, path+"/"+devfilename + ".true." + exp_config["source_id"]), 'r')
+    outfile.write(infile.readline())
+    infile.close()
     dic = read_moses_ini(os.path.join(easy_config.easy_tuning, path))
+    new_line = ""
     if dic :
       print path + '\t' + dic['LM0'] + '\t' + dic['TranslationModel00'] + '\t' + dic['bleu']
+      for k in sorted(dic):
+        if k == "bleu":continue
+        # print k
+        new_line += dic[k].strip() + '\t'
+      outfile.write(new_line+'\n')
+      # break
+    else:
+      count += 1
+      outfile.write(standard_line + '\n')
+  print count
+  outfile.close()
+
+def fan_decoder(easy_config, infilename):
+  # testfilename = utils.get_filename(exp_config["test_corpus"])
+  count = 0
+  if not os.path.exists(os.path.join(easy_config.easy_evaluation, "fun")):
+    os.mkdir(os.path.join(easy_config.easy_evaluation, "fun"))
+  infile = open(infilename, 'r')
+  state = 0
+  for line in infile.readlines():
+    if state == 0:
+      outfile = open(os.path.join(easy_config.easy_evaluation, "fun/"+str(count) + '.' + exp_config["source_id"]), 'w')
+      outfile.write(line)
+      outfile.close()
+      state = 1
+    elif state == 1:
+      weight_dic = weights2weightsdic(line)
+      generate_moses_ini(os.path.join(easy_config.easy_evaluation, "fun/moses."+str(count)+".ini"), os.path.join(easy_config.easy_train,"model/moses.ini"), weight_dic)
+      command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
+        + " -threads " + exp_config["threads"]\
+        + " -f " + os.path.join(easy_config.easy_evaluation, "fun/moses."+str(count)+".ini")\
+        + " < " + os.path.join(easy_config.easy_evaluation, "fun/"+str(count) + '.' + exp_config["source_id"])\
+        + " > " + os.path.join(easy_config.easy_evaluation, "fun/"+str(count) + ".translated")\
+        + " 2>" + os.path.join(easy_config.easy_evaluation, "fun/"+str(count) + ".out") + " "
+      os.system(command1)
+      count += 1
+      state = 0
+      # break
 
 ######################   bnplm #############################################
 
@@ -130,7 +180,7 @@ def smt_testing (easy_config) :
 def smt_check_train(easy_config):
   training_filename = utils.get_filename(exp_config["training_corpus"])
   import commands
-  lines = int(commands.getstatusoutput('wc -l ' + os.path.join(easy_config.easy_corpus, training_filename+'.clean.'+exp_config["source_id"]))[1].split(' ')[0])
+  lines = int(commands.getstatusoutput('wc -l ' + os.path.join(easy_config.easy_corpus, training_filename+'.clean.'+exp_config["source_id"])) [1].split(' ')[0])
   print "pairs ", lines
   # return 
   from nmt import overfitting_prepare
@@ -160,7 +210,7 @@ def nmt_prepare(easy_config):
   write_step("finish nmt_prepare", easy_config)
   
 def nmt_train(easy_config):
-  create_statefile(easy_config)
+  # create_statefile(easy_config)
   command1 = "python " + easy_config.nmt_path + "train.py"\
     + " --proto=" + "prototype_search_state"\
     + " --state " + os.path.join(easy_config.easy_train, "state.py")\
@@ -285,8 +335,9 @@ def easymoses ():
   # bnplm (easy_config)
   # add_bnplm_feature(easy_config)
   # smt_tuning (easy_config)
-  fan_tuning(easy_config)
+  # fan_tuning(easy_config)
   # fan_analyze(easy_config)
+  # fan_decoder(easy_config, "/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/sentences_weights.txt")
   # print read_moses_ini("/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/1/")
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
@@ -295,7 +346,7 @@ def easymoses ():
   # nplm (easy_config)
   
   # nmt_prepare(easy_config)
-  # nmt_train(easy_config)
+  nmt_train(easy_config)
   # nmt_check_overfitting(easy_config)
   # nmt_check_overfitting_2(easy_config)
   # nmt_dev(easy_config)

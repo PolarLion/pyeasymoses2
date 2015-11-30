@@ -161,9 +161,11 @@ def read_moses_ini(inpath):
     mt = re.match(r'# BLEU (\d\.?\d*)(.*)', line)
     if mt :
       # #print mt.groups()[0]
-      if mt.groups()[0] == "0":return ini_dict
+      if mt.groups()[0] == "0":
+        # print inpath
+        return ini_dict
       ini_dict['bleu'] = mt.groups()[0]
-      continue
+      
     lr0 = re.match(r'LexicalReordering0= (.*)', line)
     if lr0:
       #print lr0.groups()[0]
@@ -171,27 +173,27 @@ def read_moses_ini(inpath):
       for w in lr0.groups()[0].split(' '):
         ini_dict['LexicalReordering0'+str(count)] = w
         count += 1
-      continue
+      
     d0 = re.match(r'Distortion0= (.+)', line)
     if d0:
       #print d0.groups()[0]
       ini_dict['Distortion0']=d0.groups()[0]
-      continue
+      
     LM0 = re.match(r'LM0= (.+)', line)
     if LM0:
       # print LM0.groups()[0]
       ini_dict['LM0']=LM0.groups()[0]
-      continue
+      
     WordPenalty0 = re.match(r'WordPenalty0= (.+)', line)
     if WordPenalty0:
       #print WordPenalty0.groups()[0]
       ini_dict['WordPenalty0']=WordPenalty0.groups()[0]
-      continue
+      
     PhrasePenalty0 = re.match(r'PhrasePenalty0= (.+)', line)
     if PhrasePenalty0:
       #print PhrasePenalty0.groups()[0]
       ini_dict['PhrasePenalty0']=PhrasePenalty0.groups()[0]
-      continue
+      
     TranslationModel0 = re.match(r'TranslationModel0= (.*)', line)
     if TranslationModel0:
       #print TranslationModel0.groups()[0]
@@ -199,21 +201,67 @@ def read_moses_ini(inpath):
       for w in TranslationModel0.groups()[0].split(' '):
         ini_dict['TranslationModel0'+str(count)] = w
         count += 1
-      continue
+      
     UnknownWordPenalty0 = re.match(r'UnknownWordPenalty0= (.+)', line)
     if UnknownWordPenalty0:
       #print UnknownWordPenalty0.groups()[0]
       ini_dict['UnknownWordPenalty0']=UnknownWordPenalty0.groups()[0]
-      continue
+      
   return ini_dict
     # else:
       # print line
   # exit()
 
+def weights2weightsdic(weights):
+  weights_dict = {}
+  # print weights
+  Distortion0, LM0, LexicalReordering00, LexicalReordering01, LexicalReordering02, LexicalReordering03, LexicalReordering04, LexicalReordering05, PhrasePenalty0, TranslationModel00, TranslationModel01, TranslationModel02, TranslationModel03, UnknownWordPenalty0, WordPenalty0 = weights.strip().split('\t')
+  weights_dict["Distortion0"]=str(Distortion0)
+  weights_dict["LM0"]=LM0
+  weights_dict["LexicalReordering0"] = str(LexicalReordering00) + ' ' + str(LexicalReordering01) + ' ' + str(LexicalReordering02) + ' ' + str(LexicalReordering03) + ' ' + str(LexicalReordering04) + ' ' + str(LexicalReordering05)
+  weights_dict["PhrasePenalty0"]=str(PhrasePenalty0)
+  weights_dict["TranslationModel0"]=str(TranslationModel00)+' '+str(TranslationModel01)+' '+str(TranslationModel02)+' '+str(TranslationModel03)
+  weights_dict["UnknownWordPenalty0"]=str(UnknownWordPenalty0)
+  weights_dict["WordPenalty0"]=str(WordPenalty0)
+  return weights_dict
 
-
-
-
+def generate_moses_ini(filename, old_ini, weights_dict):
+  import re
+  ini_file = open(old_ini, 'r')
+  outfile = open(filename, 'w')
+  for line in ini_file.readlines():
+    LexicalReordering0 = re.match(r'LexicalReordering0= (.*)', line)
+    Distortion0 = re.match(r'Distortion0= (.+)', line)
+    LM0 = re.match(r'LM0= (.+)', line)
+    WordPenalty0 = re.match(r'WordPenalty0= (.+)', line)
+    PhrasePenalty0 = re.match(r'PhrasePenalty0= (.+)', line)
+    TranslationModel0 = re.match(r'TranslationModel0= (.*)', line)
+    UnknownWordPenalty0 = re.match(r'UnknownWordPenalty0= (.+)', line)
+    if LexicalReordering0:
+      #print lr0.groups()[0]
+      outfile.write("LexicalReordering0= "+weights_dict["LexicalReordering0"]+'\n')
+    elif Distortion0:
+      outfile.write("Distortion0= "+weights_dict["Distortion0"]+'\n')
+      #print d0.groups()[0]
+    elif LM0:
+      outfile.write("LM0= "+weights_dict["LM0"]+'\n')
+      # print LM0.groups()[0]
+    elif WordPenalty0:
+      outfile.write("WordPenalty0= "+weights_dict["WordPenalty0"]+'\n')
+      #print WordPenalty0.groups()[0]
+    elif PhrasePenalty0:
+      outfile.write("PhrasePenalty0= "+weights_dict["PhrasePenalty0"]+'\n')
+      #print PhrasePenalty0.groups()[0]
+    elif TranslationModel0:
+      outfile.write("TranslationModel0= "+weights_dict["TranslationModel0"]+'\n')
+      #print TranslationModel0.groups()[0]
+    elif UnknownWordPenalty0:
+      outfile.write("UnknownWordPenalty0= "+weights_dict["UnknownWordPenalty0"]+'\n')
+      #print UnknownWordPenalty0.groups()[0]
+    else:
+      outfile.write(line)
+  outfile.close()
+      
 #########################  training translation system 
 
 ####################### testing #############################################
@@ -316,7 +364,7 @@ def prepare_corpus (easy_config) :
   command1 = (easy_config.mosesdecoder_path + "scripts/tokenizer/tokenizer.perl -l " + exp_config["target_id"] 
     + " -threads " + exp_config["threads"]
     + " -no-escape 1 "
-    + " < " + exp_config["training_corpus"] + training_filename + "." + exp_config["target_id"] 
+    + " < " + exp_config["training_corpus"] + training_filename + "." + exp_config["target_id"]
     + " > " + easy_config.easy_nplm + training_filename + ".tok." + exp_config["target_id"])
   command2 = (easy_config.mosesdecoder_path + "scripts/recaser/truecase.perl --model " 
     + " " + easy_config.easy_truecaser + "truecase-model." + exp_config["target_id"] 
