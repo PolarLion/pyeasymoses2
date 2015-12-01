@@ -225,42 +225,17 @@ def weights2weightsdic(weights):
   weights_dict["WordPenalty0"]=str(WordPenalty0)
   return weights_dict
 
-def generate_moses_ini(filename, old_ini, weights_dict):
-  import re
-  ini_file = open(old_ini, 'r')
-  outfile = open(filename, 'w')
-  for line in ini_file.readlines():
-    LexicalReordering0 = re.match(r'LexicalReordering0= (.*)', line)
-    Distortion0 = re.match(r'Distortion0= (.+)', line)
-    LM0 = re.match(r'LM0= (.+)', line)
-    WordPenalty0 = re.match(r'WordPenalty0= (.+)', line)
-    PhrasePenalty0 = re.match(r'PhrasePenalty0= (.+)', line)
-    TranslationModel0 = re.match(r'TranslationModel0= (.*)', line)
-    UnknownWordPenalty0 = re.match(r'UnknownWordPenalty0= (.+)', line)
-    if LexicalReordering0:
-      #print lr0.groups()[0]
-      outfile.write("LexicalReordering0= "+weights_dict["LexicalReordering0"]+'\n')
-    elif Distortion0:
-      outfile.write("Distortion0= "+weights_dict["Distortion0"]+'\n')
-      #print d0.groups()[0]
-    elif LM0:
-      outfile.write("LM0= "+weights_dict["LM0"]+'\n')
-      # print LM0.groups()[0]
-    elif WordPenalty0:
-      outfile.write("WordPenalty0= "+weights_dict["WordPenalty0"]+'\n')
-      #print WordPenalty0.groups()[0]
-    elif PhrasePenalty0:
-      outfile.write("PhrasePenalty0= "+weights_dict["PhrasePenalty0"]+'\n')
-      #print PhrasePenalty0.groups()[0]
-    elif TranslationModel0:
-      outfile.write("TranslationModel0= "+weights_dict["TranslationModel0"]+'\n')
-      #print TranslationModel0.groups()[0]
-    elif UnknownWordPenalty0:
-      outfile.write("UnknownWordPenalty0= "+weights_dict["UnknownWordPenalty0"]+'\n')
-      #print UnknownWordPenalty0.groups()[0]
-    else:
-      outfile.write(line)
-  outfile.close()
+def generate_weight_setting(w_id, weights_dict):
+  weights = ""
+  weights += "id="+str(w_id) + '\n'
+  weights += "UnknownWordPenalty0= " + weights_dict["UnknownWordPenalty0"] + '\n'
+  weights += "WordPenalty0= " + weights_dict["WordPenalty0"] + '\n'
+  weights += "PhrasePenalty0= " + weights_dict["PhrasePenalty0"] + '\n'
+  weights += "TranslationModel0= " + weights_dict["TranslationModel0"] + '\n'
+  weights += "LexicalReordering0= " + weights_dict["LexicalReordering0"] + '\n'
+  weights += "Distortion0= " + weights_dict["Distortion0"] + '\n'
+  weights += "LM0= " + weights_dict["LM0"] + '\n'
+  return weights
       
 #########################  training translation system 
 
@@ -469,4 +444,3 @@ def train_nplm (easy_config, training_filename) :
     + " &> " + os.path.join(easy_config.easy_bnplm, "nplm.out") + " &"
   write_step (command1, easy_config)
   os.system(command1)
-
