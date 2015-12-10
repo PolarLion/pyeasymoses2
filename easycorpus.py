@@ -186,7 +186,7 @@ def count_corpus_words(path):
 
 def batch_create_corpus(inpath,opath, num=10, filename="C_B"):
   dirs = os.listdir(inpath)
-  i = 4
+  i = 39
   while (i < num):
     oopath = os.path.join(opath, str(i))
     if not os.path.exists(oopath):
@@ -364,18 +364,18 @@ def divide_corpus_by_sentence(inpath, outpath, num):
 
 def main():
   print "hello polarlion"
-  divide_corpus_by_sentence("/home/xwshi/easymoses_workspace2/fan-tuning/Dev/", "/home/xwshi/easymoses_workspace2/fan-tuning/Dev-divide/", 1000)
+  # divide_corpus_by_sentence("/home/xwshi/easymoses_workspace2/fan-tuning/Dev/", "/home/xwshi/easymoses_workspace2/fan-tuning/Dev-divide/", 1000)
   # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/Test/WMT.Test.en", "/home/xwshi/data2/Alphabet-WMT/Test/AWMT.Test.en")
   # word2alphabet("/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr", "test.en")
   # alphabet2word("test.en", "test.new")
   # bleu("test.new", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5/WMT.Train.fr")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-divide/0","/home/xwshi/data/wmt/B-divide-1800", 10, wmt_dict)
-  # batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/0.5", num=5, filename="WMT")
+  # batch_create_corpus("/home/xwshi/data/wmt/B-divide-1800", "/home/xwshi/data2/WMT-Corpus-Bleu/", num=30, filename="WMT")
   # limiting_sentence_length ("/home/xwshi/data/wmt/Bahdanau/", "en", "fr", "/home/xwshi/data/wmt/Bahdanau-clean/")
   # wmt_dict = check_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100", "fr", "en")
   # divide_corpus("/home/xwshi/data/wmt/Bahdanau-clean-100","/home/xwshi/data/wmt/Bahdanau-divide", 180, wmt_dict)
-  # batch_create_corpus("/home/xwshi/data/wmt/Bahdanau-divide", "/home/xwshi/data2/WMT-Corpus-Bleu", num=1, filename="WMT")
+  batch_create_corpus("/home/xwshi/data/wmt/Bahdanau-divide", "/home/xwshi/data2/WMT-Corpus-Bleu", num=40, filename="WMT")
   #prepare_gale_corpus("/home/xwshi/data/ldc-zh-en/gale_p1_ch_blog", "/home/xwshi/data/ldc-zh-en/gale", "gale_p1_ch_blog")
   #batch_untar("/home/xwshi/data/ldc-zh-en/tgz", "/home/xwshi/data/ldc-zh-en/untgz/")
   #batch_prepare_gale_corpus("/home/xwshi/data/ldc-zh-en/untgz/", "/home/xwshi/data/ldc-zh-en/gale")

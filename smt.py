@@ -283,7 +283,7 @@ def t_filter_model_given_input (easy_config, testfilename) :
 
 def run_test (easy_config, testfilename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
-    + " -threads " + exp_config["threads"]\
+    + " -threads 1"\
     + " -f " + os.path.join(easy_config.easy_tuning, "moses.ini ")\
     + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["source_id"])\
     + " > " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])\

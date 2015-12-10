@@ -13,16 +13,17 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-# exp_group = "smt-phrase-nnjm-wmt"
-# exp_id = "9"
+exp_group = "smt-phrase-nnjm-wmt"
+exp_id = "19"
 # exp_group = "nmt-alphabet-wmt"
 # exp_id = "1"
 # exp_group = "nmt-wmtcb"
 # exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
 # exp_id = "180"
-exp_group = "fan-tuning"
-exp_id = "x"
+# exp_group = "fan-tuning"
+# exp_id = "x"
+# exp_id = "base"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
 
@@ -69,8 +70,8 @@ def smt_tuning (easy_config) :
   # print "finish tuning"
 
 def fan_tuning (easy_config):
-  num = 3100
-  for i in range(3001, num+1):
+  num = 4935
+  for i in range(4801, num+1):
     devfilename = utils.get_filename(exp_config["develop_corpus"]+str(i))
     if not os.path.exists(os.path.join(easy_config.easy_tuning, str(i))):
       os.mkdir(os.path.join(easy_config.easy_tuning, str(i)))
@@ -93,7 +94,8 @@ def fan_analyze(easy_config):
   print devfilename
   standard_line = "0.0105348\t0.0651135\t0.0532412\t0.00603957\t0.0532839\t0.0809408\t0.122954\t0.271147\t0.0633011\t0.0520243\t0.0513287\t0.0239177\t0.024159\t1\t-0.122014"
   paths = os.listdir(easy_config.easy_tuning)
-  outfile = open(os.path.join(easy_config.easy_tuning, "sentences.txt"),'w')
+  outfile = open(os.path.join(easy_config.easy_tuning, "sentences_weights.txt"),'w')
+  count0 = 0
   count = 0
   for path in paths:
     if os.path.isfile(os.path.join(easy_config.easy_tuning, path)):continue
@@ -111,11 +113,12 @@ def fan_analyze(easy_config):
         # print k
         new_line += dic[k].strip() + '\t'
       outfile.write(new_line+'\n')
+      count += 1
       # break
     else:
-      count += 1
+      count0 += 1
       outfile.write(standard_line + '\n')
-  print count
+  print count0, count
   outfile.close()
 
 def fan_decoder(easy_config, infilename):
@@ -143,26 +146,28 @@ def fan_decoder(easy_config, infilename):
       # outfile.close()
       state = 1
     elif state == 1:
-      weight_dic = weights2weightsdic(line)
+      weight_dic = weights2weightsdic(line.strip())
       new_moses_ini.write(generate_weight_setting(count, weight_dic))
       count += 1
       state = 0
   infile.close()
   testfile.close()
   new_moses_ini.close()
-  command1 = "" + easy_config.mosesdecoder_path + "bin/moses "\
+  command1=easy_config.mosesdecoder_path+"bin/moses "\
+    + " -threads 1"\
+    + " -alternate-weight-setting"\
     + " -f " + os.path.join(easy_config.easy_evaluation, "moses.ini ")\
     + " -i " + os.path.join(easy_config.easy_evaluation, testfilename + "." + exp_config["source_id"])\
-    + " --xml-input --alternate-weight-setting"\
     + " > " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])\
     + " 2> " + os.path.join(easy_config.easy_evaluation, testfilename + ".out") + " "
   command2 = easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl "\
     + " -lc " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["target_id"])\
     + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])
-  # write_step (command1, easy_config)
-  # os.system(command1)
+  write_step (command1, easy_config)
+  os.system(command1)
   write_step (command2, easy_config)
   os.system(command2)
+  
 
 ######################   bnplm #############################################
 
@@ -188,9 +193,10 @@ def bnplm (easy_config) :
 #########################  test  ###########################
 def smt_testing (easy_config) :
   # t_start (easy_config)
-  testfilename = utils.get_filename(exp_config["test_corpus"])
-  t_tokenisation (easy_config, testfilename)
-  t_truecasing (easy_config, testfilename)
+  # testfilename = utils.get_filename(exp_config["test_corpus"])
+  testfilename = utils.get_filename(exp_config["develop_corpus"])
+  # t_tokenisation (easy_config, testfilename)
+  # t_truecasing (easy_config, testfilename)
   # t_filter_model_given_input (easy_config)
   run_test (easy_config, testfilename)
   view_result (easy_config, testfilename)
@@ -342,7 +348,6 @@ def bleu_score(easy_config):
 #########################  nmt ############################
 
 
-
 def easymoses ():
   a = 0
   if "true" != exp_config["config"]:
@@ -353,10 +358,10 @@ def easymoses ():
   # smt_translation_model_training (easy_config)
   # bnplm (easy_config)
   # add_bnplm_feature(easy_config)
-  # smt_tuning (easy_config)
+  smt_tuning (easy_config)
   # fan_tuning(easy_config)
   # fan_analyze(easy_config)
-  fan_decoder(easy_config, "/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/sentences_weights.txt")
+  # fan_decoder(easy_config, "/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/sentences_weights.txt")
   # print read_moses_ini("/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/1/")
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
