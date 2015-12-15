@@ -77,11 +77,9 @@ def create_statefile(easy_config):
     outfile.write(text+'\n')
     outfile.close()
 
-
 def overfitting_prepare(easy_config, training_filename, sampling_base = 30):
   easycorpus.sampling_file(os.path.join(easy_config.easy_corpus, training_filename+".clean."+exp_config["source_id"]), 
     easy_config.easy_overfitting+"/OF.clean."+exp_config["source_id"], sampling_base)
   easycorpus.sampling_file(os.path.join(easy_config.easy_corpus, training_filename+".clean."+exp_config["target_id"]), 
     easy_config.easy_overfitting+"/OF.clean."+exp_config["target_id"], sampling_base)
   write_step("overfitting_prepare", easy_config)
-

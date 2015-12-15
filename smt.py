@@ -92,7 +92,7 @@ def generate_blm (easy_config, training_filename) :
 
 def translation_model (easy_config, training_filename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "scripts/training/train-model.perl "\
-    + " -mgiza -mgiza-cpus 16 -cores 2 "\
+    + " -mgiza -mgiza-cpus " + exp_config["threads"] + " -cores 2 "\
     + " -root-dir " + easy_config.easy_train\
     + " -corpus " + " " + os.path.join(easy_config.easy_corpus, training_filename + ".clean")\
     + " -f " + exp_config["source_id"] + " -e " + exp_config["target_id"]\
@@ -213,9 +213,10 @@ def read_moses_ini(inpath):
   # exit()
 
 def weights2weightsdic(weights):
+  import re
   weights_dict = {}
   # print weights
-  Distortion0, LM0, LexicalReordering00, LexicalReordering01, LexicalReordering02, LexicalReordering03, LexicalReordering04, LexicalReordering05, PhrasePenalty0, TranslationModel00, TranslationModel01, TranslationModel02, TranslationModel03, UnknownWordPenalty0, WordPenalty0 = weights.strip().split('\t')
+  Distortion0, LM0, LexicalReordering00, LexicalReordering01, LexicalReordering02, LexicalReordering03, LexicalReordering04, LexicalReordering05, PhrasePenalty0, TranslationModel00, TranslationModel01, TranslationModel02, TranslationModel03, UnknownWordPenalty0, WordPenalty0 = re.split(r'[\t\s]',weights.strip())
   weights_dict["Distortion0"]=str(Distortion0)
   weights_dict["LM0"]=LM0
   weights_dict["LexicalReordering0"] = str(LexicalReordering00) + ' ' + str(LexicalReordering01) + ' ' + str(LexicalReordering02) + ' ' + str(LexicalReordering03) + ' ' + str(LexicalReordering04) + ' ' + str(LexicalReordering05)
@@ -283,7 +284,7 @@ def t_filter_model_given_input (easy_config, testfilename) :
 
 def run_test (easy_config, testfilename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
-    + " -threads 1"\
+    + " -threads "+exp_config["threads"]\
     + " -f " + os.path.join(easy_config.easy_tuning, "moses.ini ")\
     + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["source_id"])\
     + " > " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])\

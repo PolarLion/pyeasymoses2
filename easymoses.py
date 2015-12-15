@@ -13,16 +13,16 @@ reload(sys)
 sys.setdefaultencoding('utf8') 
 
 # exp_group = "test"
-exp_group = "smt-phrase-nnjm-wmt"
-exp_id = "19"
+# exp_group = "smt-phrase-nnjm-wmt"
+# exp_id = "39"
 # exp_group = "nmt-alphabet-wmt"
 # exp_id = "1"
 # exp_group = "nmt-wmtcb"
 # exp_id = "8"
 # exp_group = "smt-phrase-wmtcb"
 # exp_id = "180"
-# exp_group = "fan-tuning"
-# exp_id = "x"
+exp_group = "fan-tuning"
+exp_id = "x"
 # exp_id = "base"
 
 easy_config = EasyHelper.EasyConfig(exp_group, exp_id)
@@ -121,14 +121,12 @@ def fan_analyze(easy_config):
   print count0, count
   outfile.close()
 
-def fan_decoder(easy_config, infilename):
+def fan_decoder(easy_config, filename):
   # testfilename = utils.get_filename(exp_config["test_corpus"])
   testfilename = "C_B.Dev"
   print testfilename
-  if not os.path.exists(os.path.join(easy_config.easy_evaluation, "fun")):
-    os.mkdir(os.path.join(easy_config.easy_evaluation, "fun"))
   old_moses_ini = open(os.path.join(easy_config.easy_train,"model/moses.ini"),'r')
-  new_moses_ini = open(os.path.join(easy_config.easy_evaluation, "moses.ini"), 'w')
+  new_moses_ini = open(os.path.join(easy_config.easy_evaluation, filename+"_moses.ini"), 'w')
   for line in old_moses_ini.readlines():
     if line.strip() != "[weight]":
       new_moses_ini.write(line.strip() + '\n')
@@ -136,8 +134,8 @@ def fan_decoder(easy_config, infilename):
       new_moses_ini.write("[alternate-weight-setting]\n")
       break
   old_moses_ini.close()
-  infile = open(infilename, 'r')
-  testfile = open(os.path.join(easy_config.easy_evaluation, testfilename+'.'+exp_config['source_id']), 'w')
+  infile = open(os.path.join(easy_config.easy_evaluation, filename), 'r')
+  testfile = open(os.path.join(easy_config.easy_evaluation, filename+'.'+exp_config['source_id']), 'w')
   count = 0
   state = 0
   for line in infile.readlines():
@@ -156,19 +154,30 @@ def fan_decoder(easy_config, infilename):
   command1=easy_config.mosesdecoder_path+"bin/moses "\
     + " -threads 1"\
     + " -alternate-weight-setting"\
-    + " -f " + os.path.join(easy_config.easy_evaluation, "moses.ini ")\
-    + " -i " + os.path.join(easy_config.easy_evaluation, testfilename + "." + exp_config["source_id"])\
-    + " > " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])\
-    + " 2> " + os.path.join(easy_config.easy_evaluation, testfilename + ".out") + " "
+    + " -f " + os.path.join(easy_config.easy_evaluation, filename+"_moses.ini ")\
+    + " -i " + os.path.join(easy_config.easy_evaluation, filename + "." + exp_config["source_id"])\
+    + " > " + os.path.join(easy_config.easy_evaluation, filename + ".translated." + exp_config["target_id"])\
+    + " 2> " + os.path.join(easy_config.easy_evaluation, filename + ".out") + " "
   command2 = easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl "\
     + " -lc " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["target_id"])\
-    + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])
+    + " < " + os.path.join(easy_config.easy_evaluation, filename + ".translated." + exp_config["target_id"])
   write_step (command1, easy_config)
   os.system(command1)
   write_step (command2, easy_config)
   os.system(command2)
   
-
+def train_encdec(easy_config):
+  training_filename = utils.get_filename(exp_config["training_corpus"])
+  # pkl(easy_config, training_filename)
+  # invert(easy_config, training_filename)
+  # hdf5(easy_config, training_filename)
+  # shuff(easy_config, training_filename)
+  command1 = "python " + easy_config.nmt_path + "train.py"\
+    + " --proto=" + "prototype_encdec_state "\
+    + " --state " + os.path.join(easy_config.easy_nplm, "state.py")\
+    + " >& " + os.path.join(easy_config.easy_nplm, "out.txt")+" &"
+  write_step (command1, easy_config)
+  os.system(command1)
 ######################   bnplm #############################################
 
 def add_bnplm_feature(easy_config):
@@ -193,13 +202,13 @@ def bnplm (easy_config) :
 #########################  test  ###########################
 def smt_testing (easy_config) :
   # t_start (easy_config)
-  # testfilename = utils.get_filename(exp_config["test_corpus"])
-  testfilename = utils.get_filename(exp_config["develop_corpus"])
+  testfilename = utils.get_filename(exp_config["test_corpus"])
+  # testfilename = utils.get_filename(exp_config["develop_corpus"])
   # t_tokenisation (easy_config, testfilename)
   # t_truecasing (easy_config, testfilename)
   # t_filter_model_given_input (easy_config)
   run_test (easy_config, testfilename)
-  view_result (easy_config, testfilename)
+  # view_result (easy_config, testfilename)
   # compare_resultt (easy_config, 0)
 
 def smt_check_train(easy_config):
@@ -345,6 +354,7 @@ def bleu_score(easy_config):
     )
   write_step (command2, easy_config)
   os.system(command2)
+
 #########################  nmt ############################
 
 
@@ -358,10 +368,12 @@ def easymoses ():
   # smt_translation_model_training (easy_config)
   # bnplm (easy_config)
   # add_bnplm_feature(easy_config)
-  smt_tuning (easy_config)
+  # smt_tuning (easy_config)
   # fan_tuning(easy_config)
   # fan_analyze(easy_config)
-  # fan_decoder(easy_config, "/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/sentences_weights.txt")
+  # fan_decoder(easy_config, "1687_rnn3_s_s_t_150_200_4_dev")
+  # fan_decoder(easy_config, "/home/xwshi/easymoses_workspace2/fan-tuning/x/evalutaion/C_B.Test.zh.new")
+  train_encdec(easy_config)
   # print read_moses_ini("/home/xwshi/easymoses_workspace2/fan-tuning/x/tuning/1/")
   # smt_testing (easy_config)
   # smt_check_train(easy_config)
