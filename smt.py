@@ -273,19 +273,18 @@ def t_truecasing (easy_config, testfilename) :
   write_step (command2, easy_config)
   os.system(command2)
  
-def t_filter_model_given_input (easy_config, testfilename) :
-  command1 = (easy_config.mosesdecoder_path + "scripts/training/filter-model-given-input.pl " 
-    + " " + easy_config.easy_evaluation + "filtered-" + testfilename 
-    + " " + easy_config.working_path + "moses.ini " 
-    + " " + test_corpus_path + test_filename + ".true." + exp_config["source_id"] 
-    + " -Binarizer " + easy_config.mosesdecoder_path + "bin/processPhraseTableMin")
+def t_filter_model_given_input (easy_config, path, filename) :
+  command1 = easy_config.mosesdecoder_path + "scripts/training/filter-model-given-input.pl "\
+    + " " + os.path.join(path, "filtered-" + filename)\
+    + " " + easy_config.easy_tuning + "/moses.ini "\
+    + " " + os.path.join(path,filename) 
   write_step (command1, easy_config)
   os.system(command1)
 
 def run_test (easy_config, testfilename) :
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
     + " -threads "+exp_config["threads"]\
-    + " -f " + os.path.join(easy_config.easy_tuning, "moses.ini ")\
+    + " -f " + os.path.join(easy_config.easy_evaluation, "filtered-" +testfilename+ ".true." + exp_config["source_id"] + "/moses.ini ")\
     + " < " + os.path.join(easy_config.easy_evaluation, testfilename + ".true." + exp_config["source_id"])\
     + " > " + os.path.join(easy_config.easy_evaluation, testfilename + ".translated." + exp_config["target_id"])\
     + " 2> " + os.path.join(easy_config.easy_evaluation, testfilename + ".out") + " "
@@ -321,15 +320,17 @@ def view_result (easy_config, testfilename) :
     count += 1
 
 def test_on_train (easy_config) :
+  filename = "OF.clean." + exp_config["source_id"]
+  t_filter_model_given_input(easy_config, easy_config.easy_overfitting, filename)
   command1 = "nohup nice " + easy_config.mosesdecoder_path + "bin/moses "\
     + " -threads " + exp_config["threads"]\
-    + " -f " + os.path.join(easy_config.easy_tuning, "moses.ini ")\
-    + " < " + os.path.join(easy_config.easy_overfitting, "OF.clean." + exp_config["source_id"])\
-    + " > " + os.path.join(easy_config.easy_overfitting, "OF." + ".translated." + exp_config["target_id"])\
-    + " 2> " + os.path.join(easy_config.easy_overfitting, "OF.clean." + ".out") + " "
+    + " -f " + os.path.join(easy_config.easy_overfitting, "filtered-"+filename+"/moses.ini ")\
+    + " < " + os.path.join(easy_config.easy_overfitting, filename)\
+    + " > " + os.path.join(easy_config.easy_overfitting, "OF.translated." + exp_config["target_id"])\
+    + " 2> " + os.path.join(easy_config.easy_overfitting, "OF.clean.out") + " "
   command2 = easy_config.mosesdecoder_path + "scripts/generic/multi-bleu.perl "\
     + " -lc " + os.path.join(easy_config.easy_overfitting, "OF.clean." + exp_config["target_id"])\
-    + " < " + os.path.join(easy_config.easy_overfitting, "OF." + ".translated." + exp_config["target_id"])
+    + " < " + os.path.join(easy_config.easy_overfitting, "OF.translated." + exp_config["target_id"])
   write_step (command1, easy_config)
   os.system(command1)
   write_step (command2, easy_config)
