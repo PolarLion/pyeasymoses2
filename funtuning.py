@@ -39,14 +39,6 @@ def smt_training_corpus_preparation (easy_config) :
   write_step("finish training_corpus_preparation", easy_config)
   # print "finish corpus preparation"
 
-def smt_tuning (easy_config) :
-  devfilename = utils.get_filename(exp_config["develop_corpus"])
-  # print "tuning"
-  tuning_tokenizer (easy_config, devfilename)
-  tuning_truecase (easy_config, devfilename)
-  tuning_process (easy_config, devfilename)
-  # print "finish tuning"
-
 def fan_tuning (easy_config):
   num = 100
   for i in range(2, num):
@@ -290,12 +282,6 @@ def train_encdec(easy_config):
     + " >& " + os.path.join(easy_config.easy_nplm, "out"+hidden_dim+".txt")+" &"
   write_step (command5, easy_config)
   os.system(command5)
-
-######################   bnplm #############################################
-
-
-#########################  test  ###########################
-
 
 def bleu_score(easy_config):
   testfilename = utils.get_filename(exp_config["test_corpus"])
